@@ -10,7 +10,6 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-import shap
 from sorel_net import SorelFFNN
 
 def get_target_predictions(target, target_model, X_test):
@@ -182,10 +181,6 @@ def train_surrogate(target, data_path, save_model_path, seed):
 
     threshold = evaluate_surrogate(y_proba, y_pred_target, y_test, fpr_target)
 
-    if target in ['sorel', 'ember', 'custom']:
-        exp10, exp20 = eval_explainability(model, target_model, X_test)
-        logging.info(f"Feature explainability: top10={exp10/10}, top20={exp20/20}")
-    
     model.save_model(os.path.join(save_model_path, f'lgb_{target}_model_{seed}.txt'))
 
     return threshold
@@ -242,31 +237,4 @@ def evaluate_surrogate(y_proba, y_pred_target, y_test, fpr_target):
     logging.info(f"Confusion matrix: {conf_mat}")
 
     return thresh
-
-def eval_explainability(model, target_model, X_test, num_test_samples=2000):
-
-    idx = np.random.choice(np.arange(X_test.shape[0]), num_test_samples)
-
-    surr_ind = get_shapley_indices(model, X_test[idx], 20)
-    target_ind = get_shapley_indices(target_model, X_test[idx], 20)
-
-    exp10 = find_num_common_elements(surr_ind[:10], target_ind[:10])
-    exp20 = find_num_common_elements(surr_ind, target_ind)
-
-    return exp10, exp20
-
-def find_num_common_elements(a, b):
-    return len(np.intersect1d(a, b))
-
-def get_shapley_indices(model, X_test, k):
-    
-    try:
-        explainer = shap.TreeExplainer(model)
-    except:
-        explainer = shap.KernelExplainer(model, data=X_test)
-
-    shap_values = explainer.shap_values(X_test)[0]
-    sort_inds = np.argsort(np.sum(np.abs(shap_values), axis=0))
-
-    return sort_inds[::-1][:k]
 

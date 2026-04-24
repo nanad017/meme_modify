@@ -10,8 +10,6 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-from sorel_net import SorelFFNN
-
 def get_target_predictions(target, target_model, X_test):
 
     # if target = 'SorelFFNN':
@@ -110,6 +108,8 @@ def train_surrogate(target, data_path, save_model_path, seed):
         target_model.params["objective"] = 'binary'
         num_boosting_rounds = 648
     elif target == 'SorelFFNN':
+        from sorel_net import SorelFFNN
+
         logging.debug(f"Load sorel data and model")
         X_train, X_test, y_train, y_test = get_sorel_data('/data/mari/sorel-data')
         target_model = SorelFFNN(model_file='malware_rl/envs/utils/sorelFFNN.pt')

@@ -50,7 +50,7 @@ def register_env(env_name, model_path, target, threshold):
 
     register(
         id=env_name,
-        entry_point="malware_rl.envs:LGBEnv",
+        entry_point="malware_rl.envs.lgb_gym:LGBEnv",
         kwargs={
             "random_sample": True,
             "maxturns": max_turns,

@@ -144,8 +144,10 @@ target_env = make_vec_env(f"{TARGET}-train-v0", n_envs=1)
 target_env.seed(SEED)
 
 # Train the agent
-policy_kwargs = dict(activation_fn=th.nn.Tanh,
-                     net_arch=dict(pi=[64, 64], vf=[64, 64]))
+policy_kwargs = dict(
+    activation_fn=th.nn.Tanh,
+    net_arch=[dict(pi=[64, 64], vf=[64, 64])],
+)
 """
             gamma=0.9657974584790149,
             n_epochs=10,

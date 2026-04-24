@@ -14,7 +14,7 @@ import torch as th
 import malware_rl
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--target', choices=['ember', 'sorel', 'sorelFFNN', 'AV1'], default='ember', help='target to test')
+parser.add_argument('--target', choices=['ember', 'sorel', 'sorelFFNN', 'AV1', 'custom'], default='ember', help='target to test')
 parser.add_argument('--seed', type=int, default=26871, help='random seed')
 parser.add_argument('--num-episodes', type=int, default=300, help='number of episodes to run')
 parser.add_argument('--num-queries', type=int, default=4096, help='number of queries to run')

@@ -19,7 +19,7 @@ def get_target_predictions(target, target_model, X_test):
     X_test = np.array(X_test)
     y_proba = target_model.predict(X_test)
 
-    if target == 'ember':    
+    if target in ['ember', 'custom']:
         thresh = 0.8336
     else:
         thresh = 0.5
@@ -98,7 +98,7 @@ def train_surrogate(target, data_path, save_model_path, seed):
     np.save(os.path.join(save_model_path, 'scores.npy'), y_rl)
     logging.debug(f"Size of the RL data: {X_rl.shape[0]}")
 
-    if target == 'ember':
+    if target in ['ember', 'custom']:
         logging.debug(f"Loading ember data and model")
         X_train, X_test, y_train, y_test = get_ember_data('/data/mari/ember2018')
         target_model = lgb.Booster(model_file=os.path.join(save_model_path, 'ember_model.txt'))
@@ -171,7 +171,7 @@ def train_surrogate(target, data_path, save_model_path, seed):
     else:
         y_pred_target = None
 
-    if target == 'ember':
+    if target in ['ember', 'custom']:
         fpr_target = 0.01
     elif target == 'sorel':
         fpr_target = 0.002
@@ -182,7 +182,7 @@ def train_surrogate(target, data_path, save_model_path, seed):
 
     threshold = evaluate_surrogate(y_proba, y_pred_target, y_test, fpr_target)
 
-    if target in ['sorel', 'ember']:
+    if target in ['sorel', 'ember', 'custom']:
         exp10, exp20 = eval_explainability(model, target_model, X_test)
         logging.info(f"Feature explainability: top10={exp10/10}, top20={exp20/20}")
     

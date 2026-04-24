@@ -105,7 +105,7 @@ def evaluate_agent(agent, env_string, num_episodes, num_queries, outdir, seed=0)
     return queries
 
 argparser = argparse.ArgumentParser()
-argparser.add_argument("--target", choices=["ember", "sorel", "sorelFFNN", 'AV1'], default="ember", help="Target to train on")
+argparser.add_argument("--target", choices=["ember", "sorel", "sorelFFNN", 'AV1', 'custom'], default="ember", help="Target to train on")
 argparser.add_argument("--seed", type=int, default=26871, help="Random seed")
 argparser.add_argument("--num_boosting_rounds", type=int, default=500, help="Number of boosting rounds")
 argparser.add_argument("--init_timesteps", type=int, default=256, help="Number of timesteps to train on")

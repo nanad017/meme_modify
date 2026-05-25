@@ -8,8 +8,6 @@ from gym import wrappers
 from stable_baselines3 import PPO
 import argparse
 
-import malware_rl
-
 TARGET_ALIASES = {
     "sorel-ffnn": "sorelFFNN",
     "sorel_ffnn": "sorelFFNN",
@@ -71,8 +69,22 @@ if __name__ == "__main__":
     parser.add_argument("--target", type=normalize_target, choices=["ember", "sorel", "sorelFFNN", "AV1", "custom"], default="sorelFFNN")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--agent", type=str, default="saved_models/ppo-only-sorelFFNN-train-v0-26871.zip")
+    parser.add_argument("--num-episodes", type=int, default=300)
+    parser.add_argument("--train-dir", type=str, help="folder containing the pre-split training samples")
+    parser.add_argument("--test-dir", type=str, help="folder containing the pre-split test samples")
+    parser.add_argument("--split-file", type=str, help="manifest JSON created by a previous run")
     
     args = parser.parse_args()
+    if bool(args.train_dir) != bool(args.test_dir):
+        parser.error("--train-dir and --test-dir must be provided together")
+    if args.train_dir and args.test_dir:
+        os.environ["MALWARE_RL_TRAIN_DIR"] = args.train_dir
+        os.environ["MALWARE_RL_TEST_DIR"] = args.test_dir
+    if args.split_file:
+        os.environ["MALWARE_RL_SPLIT_FILE"] = args.split_file
+
+    import malware_rl
+
     target = args.target
     seed = args.seed
     agent = args.agent
@@ -81,4 +93,4 @@ if __name__ == "__main__":
     outdir = os.path.join(module_path, "data/logs/ppo-agent-results")
 
     test_env = f"{target}-test-v0"
-    evaluate_model(agent, test_env, 300, outdir, seed)
+    evaluate_model(agent, test_env, args.num_episodes, outdir, seed)

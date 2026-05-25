@@ -42,7 +42,27 @@ Zbot/<filename>
 
 ## Train/test split saving
 
-- Updated `malware_rl/__init__.py` so the train/test split is saved after it is created.
+- Updated `malware_rl/__init__.py` so it no longer automatically creates a 70/30 train/test split.
+- The code now requires an explicit dataset source:
+  - provide both train and test folders, or
+  - provide an existing split manifest with `MALWARE_RL_SPLIT_FILE`.
+- If external train/test folders are provided, the code uses those exact folders:
+  - `*-train-v0` environments load samples only from the train folder.
+  - `*-test-v0` environments load samples only from the test folder.
+- External paths can be provided with CLI args:
+
+```bash
+python ppo.py --train-dir <train_folder> --test-dir <test_folder>
+python evaluate.py --agent <model.zip> --train-dir <train_folder> --test-dir <test_folder>
+```
+
+- Or with environment variables:
+
+```bash
+MALWARE_RL_TRAIN_DIR=<train_folder>
+MALWARE_RL_TEST_DIR=<test_folder>
+```
+
 - Split output folder:
 
 ```text
@@ -59,11 +79,7 @@ data/splits/samples/train/<family>/samples.txt
 data/splits/samples/test/<family>/samples.txt
 ```
 
-- The split uses a fixed seed by default:
-
-```text
-MALWARE_RL_SPLIT_SEED=42
-```
+- Because automatic splitting is disabled, `MALWARE_RL_SPLIT_SEED` is no longer used to create a new split.
 
 - The split output directory can be changed with:
 
@@ -71,13 +87,18 @@ MALWARE_RL_SPLIT_SEED=42
 MALWARE_RL_SPLIT_DIR=<path>
 ```
 
-- An existing split can be selected instead of creating a new one with:
+- An existing split can be selected with:
 
 ```text
 MALWARE_RL_SPLIT_FILE=data/splits/samples/split.json
 ```
 
 - The code saves only manifest files, not copies of the binary samples.
+- `split.json` stores each split root plus relative sample paths, so future runs can reload the same dataset with:
+
+```bash
+MALWARE_RL_SPLIT_FILE=data/splits/samples/split.json
+```
 
 ## Evasion output structure
 

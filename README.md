@@ -27,6 +27,33 @@ In order to run an experiment for the ember target with the MEME algorithm:
 
 `python ppo_model_extract.py --target ember --seed 39720 --eval_timesteps 1024 --num_timesteps 2048 --num_rounds 2`
 
+## External train/test dataset folders
+
+The code no longer creates an automatic 70/30 train/test split. You must provide either:
+- a train folder and a test folder that were split outside this codebase, or
+- an explicit split manifest created by a previous run.
+
+When train/test folders are set, the code uses those folders directly: `*-train-v0` environments load samples from the train folder and `*-test-v0` environments load samples from the test folder.
+
+```bash
+python ppo.py --target sorelFFNN --train-dir /path/to/train --test-dir /path/to/test
+python evaluate.py --target sorelFFNN --agent saved_models/model.zip --train-dir /path/to/train --test-dir /path/to/test
+```
+
+The same paths can be provided through environment variables:
+
+```bash
+export MALWARE_RL_TRAIN_DIR=/path/to/train
+export MALWARE_RL_TEST_DIR=/path/to/test
+python ppo_model_extract.py --target custom --seed 39720
+```
+
+`data/splits/samples/split.json` is a manifest only. It stores each split root and the relative sample list; it does not copy binary samples. A later run can reuse that manifest:
+
+```bash
+python evaluate.py --target sorelFFNN --agent saved_models/model.zip --split-file data/splits/samples/split.json
+```
+
 # MalwareRL
 > Malware Bypass Research using Reinforcement Learning
 

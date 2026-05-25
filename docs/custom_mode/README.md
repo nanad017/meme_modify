@@ -63,7 +63,7 @@ Mode `custom` duoc them de:
 
 ## Flow cua custom mode
 
-1. RL env lay sample PE tu `malware_rl/envs/utils/samples/`
+1. RL env lay sample PE tu train/test folder da set, hoac mac dinh tu `malware_rl/envs/utils/samples/`
 2. Action modifier sua binary
 3. `CustomDetectorEnv` goi `CustomAPIModel.predict_sample(bytez, sha256)`
 4. `CustomAPIModel` ghi file vao:
@@ -158,18 +158,24 @@ export CUSTOM_DETECTOR_THRESHOLD="0.5"
 python ppo_model_extract.py --target custom --seed 39720
 ```
 
+Neu da chia dataset tu ben ngoai:
+
+```bash
+python ppo_model_extract.py --target custom --seed 39720 --train-dir /path/to/train --test-dir /path/to/test
+```
+
 ### 5. Chay thu nhanh
 
 Random agent:
 
 ```bash
-python random_agent.py --target custom --seed 39720
+python random_agent.py --target custom --seed 39720 --train-dir /path/to/train --test-dir /path/to/test
 ```
 
 PPO don gian:
 
 ```bash
-python ppo.py --target custom --seed 39720 --num-queries 4096
+python ppo.py --target custom --seed 39720 --num-queries 4096 --train-dir /path/to/train --test-dir /path/to/test
 ```
 
 ## Luu y quan trong

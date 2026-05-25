@@ -15,8 +15,6 @@ import torch as th
 
 from surrogate import train_surrogate
 
-import malware_rl
-
 TARGET_ALIASES = {
     "sorel-ffnn": "sorelFFNN",
     "sorel_ffnn": "sorelFFNN",
@@ -53,6 +51,7 @@ def init_clean(target, seed):
 def register_env(env_name, model_path, target, threshold):
     max_turns = gym.envs.registration.registry.env_specs[f'{target}-train-v0']._kwargs["maxturns"]
     sha256_list = gym.envs.registration.registry.env_specs[f'{target}-train-v0']._kwargs["sha256list"]
+    sample_root = gym.envs.registration.registry.env_specs[f'{target}-train-v0']._kwargs["sample_root"]
     
     if env_name in gym.envs.registration.registry.env_specs:
         logging.debug(f"Remove {env_name} from registry")
@@ -66,6 +65,7 @@ def register_env(env_name, model_path, target, threshold):
             "random_sample": True,
             "maxturns": max_turns,
             "sha256list": sha256_list,
+            "sample_root": sample_root,
             "save_modified_data": False,
             "model_path": model_path,
             "threshold": threshold
@@ -123,7 +123,20 @@ argparser.add_argument("--init_timesteps", type=int, default=256, help="Number o
 argparser.add_argument("--num_timesteps", type=int, default=2048, help="Number of timesteps to train on")
 argparser.add_argument("--eval_timesteps", type=int, default=2048, help="Number of timesteps to evaluate on")
 argparser.add_argument("--num_rounds", type=int, default=3, help="Number of rounds to train on")
+argparser.add_argument("--train-dir", type=str, help="folder containing the pre-split training samples")
+argparser.add_argument("--test-dir", type=str, help="folder containing the pre-split test samples")
+argparser.add_argument("--split-file", type=str, help="manifest JSON created by a previous run")
 args = argparser.parse_args()
+
+if bool(args.train_dir) != bool(args.test_dir):
+    argparser.error("--train-dir and --test-dir must be provided together")
+if args.train_dir and args.test_dir:
+    os.environ["MALWARE_RL_TRAIN_DIR"] = args.train_dir
+    os.environ["MALWARE_RL_TEST_DIR"] = args.test_dir
+if args.split_file:
+    os.environ["MALWARE_RL_SPLIT_FILE"] = args.split_file
+
+import malware_rl
 
 
 TARGET = args.target

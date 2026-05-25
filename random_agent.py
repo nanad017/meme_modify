@@ -7,8 +7,6 @@ import numpy as np
 from gym import wrappers
 import argparse
 
-import malware_rl
-
 module_path = os.path.split(os.path.abspath(sys.modules[__name__].__file__))[0]
 
 TARGET_ALIASES = {
@@ -38,7 +36,20 @@ parser.add_argument('--target', type=normalize_target, choices=['ember', 'sorel'
 parser.add_argument('--seed', type=int, default=26731, help='random seed')
 parser.add_argument('--num-episodes', type=int, default=300, help='number of episodes to run')
 parser.add_argument('--num-queries', type=int, default=4096, help='number of queries to run')
+parser.add_argument('--train-dir', type=str, help='folder containing the pre-split training samples')
+parser.add_argument('--test-dir', type=str, help='folder containing the pre-split test samples')
+parser.add_argument('--split-file', type=str, help='manifest JSON created by a previous run')
 args = parser.parse_args()
+
+if bool(args.train_dir) != bool(args.test_dir):
+    parser.error("--train-dir and --test-dir must be provided together")
+if args.train_dir and args.test_dir:
+    os.environ["MALWARE_RL_TRAIN_DIR"] = args.train_dir
+    os.environ["MALWARE_RL_TEST_DIR"] = args.test_dir
+if args.split_file:
+    os.environ["MALWARE_RL_SPLIT_FILE"] = args.split_file
+
+import malware_rl
 
 target = args.target
 seed = args.seed

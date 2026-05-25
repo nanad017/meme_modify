@@ -150,15 +150,34 @@ data/evaded/sorelFFNN/Locker/<sha256_of_modified_file>
 
 so train does not write modified evasion files.
 
-## PPO max turns
+## PPO max turns and train/test run command
 
-- Changed the shared environment max turns from `15` to `10` in `malware_rl/__init__.py`:
+- Changed the shared environment max turns default to `10` in `malware_rl/__init__.py`.
+- Added environment override support:
 
 ```python
-MAXTURNS = 10
+MAXTURNS = int(os.getenv("MALWARE_RL_MAXTURNS", "10"))
 ```
 
-- PPO uses this value through the registered train/test gym environments.
+- Added `--maxturns` to `ppo.py`, so this command can control the registered train/test gym environments.
+
+- Command requested for running PPO with explicit train/test dataset folders:
+
+```bash
+python ppo.py \
+  --target sorelFFNN \
+  --train-dir dataset/train \
+  --test-dir dataset/test \
+  --num-episodes 5961 \
+  --num-queries 59610 \
+  --maxturns 10
+```
+
+- Linux one-line command after activating the virtual environment:
+
+```bash
+python ppo.py --target sorelFFNN --train-dir dataset/train --test-dir dataset/test --num-episodes 5961 --num-queries 59610 --maxturns 10
+```
 
 ## Memory output folders
 
@@ -179,3 +198,77 @@ syntax ok
 ```
 
 - Full RL execution was not run because the workspace currently does not include real samples or `sorelFFNN.pt`.
+
+## Linux bash command to run PPO with direct dataset paths
+
+- This is a Linux bash command.
+- This command does not activate/change the virtual environment.
+- It passes the dataset paths directly into the code through CLI arguments:
+  - train data: `~/RL/dataset/main_dataset/RL/virus/`
+  - test data: `~/RL/dataset/main_dataset/test/`
+- The code then uses:
+  - `--train-dir` for the train environment.
+  - `--test-dir` for the test environment.
+
+```bash
+python ppo.py \
+  --target sorelFFNN \
+  --train-dir "$HOME/RL/dataset/main_dataset/RL/virus" \
+  --test-dir "$HOME/RL/dataset/main_dataset/test" \
+  --num-episodes 5961 \
+  --num-queries 59610 \
+  --maxturns 10
+```
+
+- One-line Linux command:
+
+```bash
+python ppo.py --target sorelFFNN --train-dir "$HOME/RL/dataset/main_dataset/RL/virus" --test-dir "$HOME/RL/dataset/main_dataset/test" --num-episodes 5961 --num-queries 59610 --maxturns 10
+```
+
+- If you want to use another dataset location, only change these two arguments:
+
+```bash
+--train-dir "/path/to/your/train"
+--test-dir "/path/to/your/test"
+```
+
+## Linux troubleshooting: `ppo.py: error: unrecognized arguments --train-dir --test-dir --maxturns`
+
+- This means the Linux machine is still running an older `ppo.py` that does not have the new CLI args yet.
+- Because `git pull` was blocked by local changes in `malware_rl/__init__.py`, the new `ppo.py` was not pulled.
+
+- If you do not want to change/stash the local code yet, run with environment variables instead:
+
+```bash
+export MALWARE_RL_TRAIN_DIR="$HOME/RL/dataset/main_dataset/RL/virus"
+export MALWARE_RL_TEST_DIR="$HOME/RL/dataset/main_dataset/test"
+export MALWARE_RL_MAXTURNS=10
+
+python ppo.py \
+  --target sorelFFNN \
+  --num-episodes 5961 \
+  --num-queries 59610
+```
+
+- Do not quote `~` like `"~/..."` because quoted `~` may not expand. Prefer `$HOME/...`.
+
+- If you want to pull the newest code first, save or remove the local change, then pull:
+
+```bash
+git status
+git stash push -m "local changes before pulling train-test args"
+git pull
+```
+
+- After the pull succeeds, the direct CLI command works:
+
+```bash
+python ppo.py \
+  --target sorelFFNN \
+  --train-dir "$HOME/RL/dataset/main_dataset/RL/virus" \
+  --test-dir "$HOME/RL/dataset/main_dataset/test" \
+  --num-episodes 5961 \
+  --num-queries 59610 \
+  --maxturns 10
+```

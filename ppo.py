@@ -30,6 +30,7 @@ parser.add_argument('--num-queries', type=int, default=4096, help='number of que
 parser.add_argument('--train-dir', type=str, help='folder containing the pre-split training samples')
 parser.add_argument('--test-dir', type=str, help='folder containing the pre-split test samples')
 parser.add_argument('--split-file', type=str, help='manifest JSON created by a previous run')
+parser.add_argument('--maxturns', type=int, default=10, help='maximum number of actions per episode')
 args = parser.parse_args()
 
 if bool(args.train_dir) != bool(args.test_dir):
@@ -39,6 +40,7 @@ if args.train_dir and args.test_dir:
     os.environ["MALWARE_RL_TEST_DIR"] = args.test_dir
 if args.split_file:
     os.environ["MALWARE_RL_SPLIT_FILE"] = args.split_file
+os.environ["MALWARE_RL_MAXTURNS"] = str(args.maxturns)
 
 import malware_rl
 

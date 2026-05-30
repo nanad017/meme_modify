@@ -107,7 +107,7 @@ def train_surrogate(target, data_path, save_model_path, seed):
         target_model = lgb.Booster(model_file=os.path.join(save_model_path, 'sorel.model'))
         target_model.params["objective"] = 'binary'
         num_boosting_rounds = 648
-    elif target == 'SorelFFNN':
+    elif target == 'sorelFFNN':
         from sorel_net import SorelFFNN
 
         logging.debug(f"Load sorel data and model")

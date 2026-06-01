@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 import argparse
 import csv
+import importlib.util
 import sys
 from pathlib import Path
 
 import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
 
-from malware_rl.envs.utils.ember import PEFeatureExtractor
+EMBER_MODULE_PATH = REPO_ROOT / "malware_rl" / "envs" / "utils" / "ember.py"
+ember_spec = importlib.util.spec_from_file_location("meme_modify_ember", EMBER_MODULE_PATH)
+ember_module = importlib.util.module_from_spec(ember_spec)
+sys.modules[ember_spec.name] = ember_module
+ember_spec.loader.exec_module(ember_module)
+PEFeatureExtractor = ember_module.PEFeatureExtractor
 
 
 FEATURE_DIM = 2381

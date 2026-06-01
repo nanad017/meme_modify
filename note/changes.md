@@ -285,3 +285,14 @@ nohup python ppo_model_extract.py \
   --num_rounds 1 \
   > ppo_model_extract.out 2>&1 & echo $! > ppo_model_extract.pid
 ```
+
+rl@rl-VMware-Virtual-Platform:~/RL/meme_modify$ source .venv37_clean/bin/activate
+nohup python ppo_model_extract.py \
+  --target sorelFFNN \
+  --train-dir "$HOME/RL/dataset/main_dataset/RL/virus" \
+  --test-dir "$HOME/RL/dataset/main_dataset/test" \
+  --eval_timesteps 59610 \
+  --num_timesteps 59610 \
+  --num_rounds 1 \
+  > ppo_model_extract.out 2>&1 & echo $! > ppo_model_extract.pid
+[1] 890612

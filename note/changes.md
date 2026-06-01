@@ -296,3 +296,35 @@ nohup python ppo_model_extract.py \
   --num_rounds 1 \
   > ppo_model_extract.out 2>&1 & echo $! > ppo_model_extract.pid
 [1] 890612
+
+tail -f ppo_model_extract.out
+
+
+dat.
+cd ~/RL/meme_modify
+
+nohup python scripts/export_ember_dat.py \
+  --out ember_dat \
+  --val-benign /home/rl/RL/dataset/main_dataset/RL/benign \
+  --val-malware /home/rl/RL/dataset/main_dataset/RL/virus \
+  --test-benign /home/rl/RL/dataset/main_dataset/RL/benign \
+  --test-malware /home/rl/RL/dataset/main_dataset/RL/virus \
+  --skip-errors > export_ember_dat.log 2>&1 &
+
+  tail -f export_ember_dat.log
+
+  ls -lh ember_dat
+cat ember_dat/*_failed.txt 2>/dev/null | head -50
+
+Nếu bạn export ra ember_dat/ chứ chưa có /data/mari/sorel-data, thì tạo link:
+
+sudo mkdir -p /data/mari
+sudo ln -s "$HOME/RL/meme_modify/ember_dat" /data/mari/sorel-data
+
+1. Train/evaluate RL trên target thật: sorelFFNN
+2. Ghi data/memory/sorelFFNN/observations.npy + scores.npy
+3. Gọi train_surrogate(...)
+4. Train LightGBM bằng lgb.train(...)
+5. Lưu malware_rl/envs/utils/lgb_sorelFFNN_model_<seed>.txt
+6. Đăng ký env lgb-train-v0
+7. Train RL tiếp trên LightGBM surrogate

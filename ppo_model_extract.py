@@ -123,6 +123,8 @@ argparser.add_argument("--init_timesteps", type=int, default=256, help="Number o
 argparser.add_argument("--num_timesteps", type=int, default=2048, help="Number of timesteps to train on")
 argparser.add_argument("--eval_timesteps", type=int, default=2048, help="Number of timesteps to evaluate on")
 argparser.add_argument("--num_rounds", type=int, default=3, help="Number of rounds to train on")
+argparser.add_argument("--final_eval_episodes", type=int, default=300, help="Number of test episodes to run in final evaluation")
+argparser.add_argument("--final_eval_queries", type=int, default=5000, help="Maximum number of queries to use in final evaluation")
 argparser.add_argument("--train-dir", type=str, help="folder containing the pre-split training samples")
 argparser.add_argument("--test-dir", type=str, help="folder containing the pre-split test samples")
 argparser.add_argument("--split-file", type=str, help="manifest JSON created by a previous run")
@@ -239,6 +241,6 @@ for i in range(num_rounds):
 
 
 logging.info(f"Final eval on the test set. Round: {i+1}")
-evaluate_agent(agent, f"{TARGET}-test-v0", 300, 5000, outdir, SEED)
+evaluate_agent(agent, f"{TARGET}-test-v0", args.final_eval_episodes, args.final_eval_queries, outdir, SEED)
 
 logging.info(f"Total number of queries: {total_queries}")
